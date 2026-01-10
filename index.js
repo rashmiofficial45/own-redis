@@ -2,21 +2,34 @@
 // Uses Node.js net module to create a server that listens on Redis default port
 
 import net from "net";
-
+import Parser from "redis-parser";
 // Redis default port is 6379
 const port = 6379;
-
+const store = {}
 // Create a TCP server that handles incoming connections
 const server = net.createServer((connection) => {
-  // Log when a new client connects to the server
-  console.log("Connection established");
-
   // Handle incoming data from the client
   connection.on("data", (data) => {
-    // Log the received data as a string
-    console.log("data:", data.toString());
+    const parser = new Parser({
+      returnReply: (reply) => {
+        const command = reply[0]
+        switch(command){
+          case 'set': {
+            const key = reply[1]
+            const value = reply[2]
+            store[key] = value
+            connection.write("+Ok\r\n")
+          }
+          break
+        }
+      },
+      returnError: (err) => {
+        console.log("error => ",err)
+      }
+    });
+    parser.execute(data)
+
     // Respond with Redis protocol simple string reply (+OK\r\n)
-    connection.write("+OK\r\n");
   });
 });
 
