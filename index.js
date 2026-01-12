@@ -127,6 +127,9 @@ const server = net.createServer((connection) => {
             connection.write(`:${store[key]}\r\n`);
             break;
           }
+          // ---------------- FALLBACK ----------------
+          default:
+            connection.write("-ERR unknown command\r\n");
         }
       },
 
