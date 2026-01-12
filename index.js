@@ -102,6 +102,14 @@ const server = net.createServer((connection) => {
             break;
           }
 
+          // ---------------- EXISTS ----------------
+          case "exists": {
+            const key = reply[1];
+            const exists = store[key] !== undefined ? 1 : 0;
+            connection.write(`:${exists}\r\n`);
+            break;
+          }
+
           
         }
       },
