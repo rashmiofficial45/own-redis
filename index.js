@@ -58,15 +58,14 @@ const server = net.createServer((connection) => {
            * Stores a key-value pair in the in-memory store.
            * Responds with "+OK\r\n" (Redis protocol simple string reply) on success.
            */
-          case "set":
-            {
-              const key = reply[1];
-              const value = reply[2];
-              store[key] = value;
-              // Redis protocol simple string reply format
-              connection.write("+Ok\r\n");
-            }
+          case "set": {
+            const key = reply[1];
+            const value = reply[2];
+            store[key] = value;
+            // Redis protocol simple string reply format
+            connection.write("+Ok\r\n");
             break;
+          }
 
           /**
            * GET command implementation:
@@ -75,16 +74,20 @@ const server = net.createServer((connection) => {
            * - "$-1\r\n" (null bulk string) if key doesn't exist
            * - "+{value}\r\n" (simple string) if key exists
            */
-          case "get":
-            {
-              const key = reply[1];
-              const value = store[key];
-              // Redis protocol null bulk string reply for non-existent keys
-              if (!value) connection.write("$-1\r\n");
-              // Redis protocol simple string reply with the value
-              connection.write(`+${value}\r\n`);
-            }
+          case "get": {
+            const key = reply[1];
+            const value = store[key];
+            // Redis protocol null bulk string reply for non-existent keys
+            if (!value) connection.write("$-1\r\n");
+            // Redis protocol simple string reply with the value
+            connection.write(`+${value}\r\n`);
             break;
+          }
+          // ---------------- PING ----------------
+          case "ping": {
+            connection.write("+PONG\r\n");
+            break;
+          }
         }
       },
 
