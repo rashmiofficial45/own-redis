@@ -110,7 +110,23 @@ const server = net.createServer((connection) => {
             break;
           }
 
-          
+          // ---------------- INCR ----------------
+          case "incr": {
+            const key = reply[1];
+
+            if (store[key] === undefined) {
+              store[key] = 1;
+            } else {
+              const num = Number(store[key]);
+              if (isNaN(num)) {
+                connection.write("-ERR value is not an integer\r\n");
+                return;
+              }
+              store[key] = num + 1;
+            }
+            connection.write(`:${store[key]}\r\n`);
+            break;
+          }
         }
       },
 
