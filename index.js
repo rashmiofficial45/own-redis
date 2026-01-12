@@ -88,6 +88,21 @@ const server = net.createServer((connection) => {
             connection.write("+PONG\r\n");
             break;
           }
+
+          // ---------------- DEL ----------------
+          case "del": {
+            const key = reply[1];
+
+            if (store[key] !== undefined) {
+              delete store[key];
+              connection.write(":1\r\n"); // integer reply (1 = deleted)
+            } else {
+              connection.write(":0\r\n"); // not found
+            }
+            break;
+          }
+
+          
         }
       },
 
