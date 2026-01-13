@@ -127,6 +127,15 @@ const server = net.createServer((connection) => {
             connection.write(`:${store[key]}\r\n`);
             break;
           }
+          // 1. EXPIRE
+          case "expire": {
+            const key = reply[1];
+            const seconds = Number(reply[2]);
+            if (store[key] === undefined) return connection.write(":0\r\n");
+            expiry[key] = Date.now() + seconds * 1000;
+            connection.write(":1\r\n");
+            break;
+          }
           // ---------------- FALLBACK ----------------
           default:
             connection.write("-ERR unknown command\r\n");
