@@ -136,6 +136,15 @@ const server = net.createServer((connection) => {
             connection.write(":1\r\n");
             break;
           }
+          // 2. TTL
+          case "ttl": {
+            const key = reply[1];
+            if (store[key] === undefined) return connection.write(":-2\r\n");
+            if (!expiry[key]) return connection.write(":-1\r\n");
+            const ttl = Math.ceil((expiry[key] - Date.now()) / 1000);
+            connection.write(`:${ttl}\r\n`);
+            break;
+          }
           // ---------------- FALLBACK ----------------
           default:
             connection.write("-ERR unknown command\r\n");
