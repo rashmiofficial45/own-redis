@@ -145,6 +145,17 @@ const server = net.createServer((connection) => {
             connection.write(`:${ttl}\r\n`);
             break;
           }
+          // 3. DECR
+          case "decr": {
+            const key = reply[1];
+            if (store[key] === undefined) store[key] = 0;
+            const num = Number(store[key]);
+            if (isNaN(num))
+              return connection.write("-ERR value is not an integer\r\n");
+            store[key] = num - 1;
+            connection.write(`:${store[key]}\r\n`);
+            break;
+          }
           // ---------------- FALLBACK ----------------
           default:
             connection.write("-ERR unknown command\r\n");
