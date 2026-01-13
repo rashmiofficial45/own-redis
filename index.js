@@ -156,6 +156,14 @@ const server = net.createServer((connection) => {
             connection.write(`:${store[key]}\r\n`);
             break;
           }
+          // 4. MSET
+          case "mset": {
+            for (let i = 1; i < reply.length; i += 2) {
+              store[reply[i]] = reply[i + 1];
+            }
+            connection.write("+OK\r\n");
+            break;
+          }
           // ---------------- FALLBACK ----------------
           default:
             connection.write("-ERR unknown command\r\n");
