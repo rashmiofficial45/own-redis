@@ -164,6 +164,17 @@ const server = net.createServer((connection) => {
             connection.write("+OK\r\n");
             break;
           }
+          // 5. MGET
+          case "mget": {
+            let response = `*${reply.length - 1}\r\n`;
+            for (let i = 1; i < reply.length; i++) {
+              const val = store[reply[i]];
+              if (val === undefined) response += "$-1\r\n";
+              else response += `$${val.length}\r\n${val}\r\n`;
+            }
+            connection.write(response);
+            break;
+          }
           // ---------------- FALLBACK ----------------
           default:
             connection.write("-ERR unknown command\r\n");
