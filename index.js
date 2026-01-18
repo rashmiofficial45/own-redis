@@ -18,6 +18,18 @@ import Parser from "redis-parser";
  */
 const port = 6379;
 const store = {};
+const expiry = {};
+setInterval(() => {
+  const now = Date.now();
+
+  for (const key in expiry) {
+    if (expiry[key] <= now) {
+      delete store[key];
+      delete expiry[key];
+    }
+  }
+}, 1000);
+
 
 /**
  * Create a TCP server that handles incoming client connections.
