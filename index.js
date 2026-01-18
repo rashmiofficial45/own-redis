@@ -88,13 +88,20 @@ const server = net.createServer((connection) => {
            */
           case "get": {
             const key = reply[1];
+
+            if (expiry[key] && expiry[key] <= Date.now()) {
+              delete store[key];
+              delete expiry[key];
+              return connection.write("$-1\r\n");
+            }
+
             const value = store[key];
-            // Redis protocol null bulk string reply for non-existent keys
-            if (!value) connection.write("$-1\r\n");
-            // Redis protocol simple string reply with the value
-            connection.write(`+${value}\r\n`);
+            if (value === undefined) return connection.write("$-1\r\n");
+
+            connection.write(`$${value.length}\r\n${value}\r\n`);
             break;
           }
+
           // ---------------- PING ----------------
           case "ping": {
             connection.write("+PONG\r\n");
